@@ -1,17 +1,16 @@
 function recurringTimer(message, interval) {
     const timerId = setInterval(() => {
-      console.log(message);
+        console.log(message);
     }, interval);
   
     return timerId;
-  }
-  
-  function stopRecurringTimer(timerId) {
+}
+
+function stopRecurringTimer(timerId) {
     clearInterval(timerId);
-  }
-  
-  module.exports = {
+}
+
+module.exports = {
     recurringTimer,
     stopRecurringTimer
-  };
-  
+};

@@ -22,6 +22,10 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "fakeTimers": {
+      "enableGlobally": true,
+      "legacyFakeTimers": true
+    },
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ],
