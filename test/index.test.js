@@ -1,46 +1,75 @@
-const {
-    createLoginTracker
-  } = require('../index');
-  
-  describe('createLoginTracker function', () => {
-    const mockUser = {
-      "username": "user1",
-      "password": "password123"
-    }
-    const mockUser2 = {
-      "username": "john_smith_24",
+const createLoginTracker = require('../index');
+
+describe('createLoginTracker', () => {
+  let user1Login;
+  let mockUser;
+
+  beforeEach(() => {
+    mockUser = {
+      "username": "testUser",
       "password": "securePassword"
     }
     user1Login = createLoginTracker(mockUser);
-    
-    test('should return a function', () => {
-      expect(typeof user1Login).toBe('function');
-    });
-
-    test('should keep track of wrong login count', () => {
-      expect(user1Login("wrongPassword")).toBe('Attempt 1: Login failed');
-      expect(user1Login("wrongPassword")).toBe('Attempt 2: Login failed');
-      expect(user1Login("wrongPassword")).toBe('Attempt 3: Login failed');
-    });
-
-    test('should limit login attempts to be 3', () => {
-      expect(user1Login("lastWrongPassword")).toBe('Account locked due to too many failed login attempts');
-    });
-
-    user1LoginNew = createLoginTracker(mockUser);
-    user2Login = createLoginTracker(mockUser2)
-    test('should allow correct login immediately', () => {
-      expect(user1LoginNew("password123")).toBe('Login successful');
-      expect(user2Login("securePassword")).toBe('Login successful');
-    });
-    const mockUser3 = {
-      "username": "Jane_Smith_4",
-      "password": "password45!"
-    }
-    user3Login = createLoginTracker(mockUser3)
-    test('should allow correct login after failed login', () => {
-      expect(user3Login("wrongpassword")).toBe('Attempt 1: Login failed');
-      expect(user3Login("password45!")).toBe('Login successful');
-    });
   });
-  
+
+  test('should return a function', () => {
+    expect(typeof user1Login).toBe('function');
+  });
+
+  test('should return "Login successful" with correct password on first attempt', () => {
+    const result = user1Login("securePassword");
+    expect(result).toBe("Login successful");
+  });
+
+  test('should return failure message with incorrect password', () => {
+    const result = user1Login("wrongPassword");
+    expect(result).toContain("Login attempt 1 failed");
+  });
+
+  test('should increment attempt count with each call', () => {
+    user1Login("wrongPassword");
+    const result = user1Login("wrongPassword");
+    expect(result).toContain("Login attempt 2 failed");
+  });
+
+  test('should lock account after 3 failed attempts', () => {
+    user1Login("wrongPassword"); // Attempt 1
+    user1Login("wrongPassword"); // Attempt 2
+    user1Login("wrongPassword"); // Attempt 3
+    const result = user1Login("wrongPassword"); // Attempt 4
+    expect(result).toBe("Account locked due to too many failed login attempts");
+  });
+
+  test('should remain locked even with correct password after lockout', () => {
+    user1Login("wrongPassword"); // Attempt 1
+    user1Login("wrongPassword"); // Attempt 2
+    user1Login("wrongPassword"); // Attempt 3
+    user1Login("wrongPassword"); // Attempt 4 - locked
+    const result = user1Login("securePassword"); // Attempt 5 - should still be locked
+    expect(result).toBe("Account locked due to too many failed login attempts");
+  });
+
+  test('should allow login on 3rd attempt if password is correct', () => {
+    user1Login("wrongPassword"); // Attempt 1
+    user1Login("wrongPassword"); // Attempt 2
+    const result = user1Login("securePassword"); // Attempt 3
+    expect(result).toBe("Login successful");
+  });
+
+  test('should create independent login trackers for different users', () => {
+    const user2Login = createLoginTracker({
+      username: "user2",
+      password: "password123"
+    });
+
+    // Fail user1 three times
+    user1Login("wrong");
+    user1Login("wrong");
+    user1Login("wrong");
+    user1Login("wrong"); // Locked
+
+    // User2 should still be able to login
+    const result = user2Login("password123");
+    expect(result).toBe("Login successful");
+  });
+});

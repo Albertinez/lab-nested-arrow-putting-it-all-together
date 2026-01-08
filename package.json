@@ -1,15 +1,33 @@
 {
   "name": "js-nested-arrow-functions-lab",
   "version": "1.0.0",
+  "description": "JavaScript Functions Lab - Nested Functions and Arrow Functions",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
-  "keywords": [],
+  "keywords": [
+    "javascript",
+    "functions",
+    "closures",
+    "arrow-functions",
+    "nested-functions"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ]
   }
 }
